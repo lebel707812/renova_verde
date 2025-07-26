@@ -25,8 +25,24 @@ export function isAuthenticated(): boolean {
   const token = localStorage.getItem('admin_token');
   if (!token) return false;
   
-  const user = verifyToken(token);
-  return user !== null;
+  try {
+    // Verificar se o token é válido decodificando-o
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    if (payload.exp && payload.exp > currentTime) {
+      // Token válido e não expirado
+      return true;
+    } else {
+      // Token expirado
+      localStorage.removeItem('admin_token');
+      return false;
+    }
+  } catch (error) {
+    // Token inválido
+    localStorage.removeItem('admin_token');
+    return false;
+  }
 }
 
 export function getAuthUser(): AuthUser | null {
@@ -35,7 +51,27 @@ export function getAuthUser(): AuthUser | null {
   const token = localStorage.getItem('admin_token');
   if (!token) return null;
   
-  return verifyToken(token);
+  try {
+    // Verificar se o token é válido decodificando-o
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    
+    if (payload.exp && payload.exp > currentTime) {
+      // Token válido e não expirado
+      return {
+        email: payload.email,
+        role: payload.role
+      };
+    } else {
+      // Token expirado
+      localStorage.removeItem('admin_token');
+      return null;
+    }
+  } catch (error) {
+    // Token inválido
+    localStorage.removeItem('admin_token');
+    return null;
+  }
 }
 
 export function logout(): void {
