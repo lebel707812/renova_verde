@@ -50,8 +50,8 @@ export default function FeaturedArticles() {
         </div>
         
         {/* Articles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {featuredArticles.map((article) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {featuredArticles.map((article, index) => (
             <ArticleCard
               key={article.id}
               title={article.title}
@@ -59,6 +59,7 @@ export default function FeaturedArticles() {
               category={article.category}
               slug={article.slug}
               excerpt={article.excerpt}
+              priority={index === 0} // Primeira imagem com priority
             />
           ))}
         </div>
