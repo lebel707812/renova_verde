@@ -55,12 +55,6 @@ export default function Header() {
             >
               Sobre
             </Link>
-            <Link 
-              href="/contato" 
-              className="text-gray-700 hover:text-primary font-medium transition-colors duration-200"
-            >
-              Contato
-            </Link>
           </nav>
 
           {/* Search Bar */}
@@ -153,13 +147,6 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre
-              </Link>
-              <Link 
-                href="/contato" 
-                className="text-gray-700 hover:text-primary font-medium transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contato
               </Link>
               <Link
                 href="/#newsletter"

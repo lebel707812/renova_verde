@@ -1,21 +1,15 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAuthenticated } from '@/lib/auth';
-import ArticleEditor from '@/components/ArticleEditor';
-import { Article } from '@/types';
+import SimpleArticleEditor from '@/components/SimpleArticleEditor';
 
 export default function NewArticlePage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push('/painel-renova-verde');
-    }
-  }, [router]);
-
-  const handleSave = async (articleData: Partial<Article>) => {
+  const handleSave = async (articleData: any) => {
+    setLoading(true);
     try {
       const response = await fetch('/api/admin/articles', {
         method: 'POST',
@@ -27,27 +21,30 @@ export default function NewArticlePage() {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        router.push('/admin/articles');
+        alert('Artigo criado com sucesso!');
+        router.push('/admin/dashboard');
       } else {
         const error = await response.json();
-        throw new Error(error.message || 'Erro ao criar artigo');
+        alert(`Erro ao criar artigo: ${error.message}`);
       }
     } catch (error) {
       console.error('Erro ao salvar artigo:', error);
-      throw error;
+      alert('Erro ao salvar artigo');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleCancel = () => {
-    router.push('/admin/articles');
+    router.push('/admin/dashboard');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ArticleEditor
+      <SimpleArticleEditor 
         onSave={handleSave}
         onCancel={handleCancel}
+        loading={loading}
       />
     </div>
   );

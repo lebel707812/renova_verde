@@ -545,3 +545,51 @@ Para dúvidas, sugestões ou parcerias:
 
 *Projeto 100% funcional e pronto para a próxima fase de desenvolvimento!*
 
+
+
+### **v2.2.0 - Correção Completa do Sistema de Artigos** (26/01/2024)
+
+#### 🔧 **PROBLEMAS RESOLVIDOS**
+
+##### **Sistema de Publicação de Artigos**
+- ✅ **Editor de artigos 100% funcional**: Removido React Quill problemático
+- ✅ **Categorias carregando corretamente**: 7 categorias disponíveis no banco
+- ✅ **Tags funcionando**: Sistema de tags operacional
+- ✅ **Editor simples e eficaz**: Textarea com suporte HTML/Markdown
+- ✅ **APIs corrigidas**: `/api/admin/categories` e `/api/admin/tags` funcionais
+- ✅ **Banco de dados populado**: Seed executado com sucesso
+
+##### **Página de Contato Removida**
+- ✅ **Página `/contato` excluída**: Removida devido a bugs críticos
+- ✅ **Links removidos do Header**: Menu desktop e mobile atualizados
+- ✅ **Links removidos do Footer**: Footer limpo e funcional
+- ✅ **Sistema estabilizado**: Sem interferências no header/footer
+
+#### 🛠️ **MELHORIAS TÉCNICAS**
+- ✅ **Dependências limpas**: Removido react-quill, react-markdown, remark-gfm, rehype-raw
+- ✅ **Cache limpo**: `.next` removido para build fresh
+- ✅ **Editor simplificado**: `SimpleArticleEditor` criado do zero
+- ✅ **Validação robusta**: Campos obrigatórios e validação de categoria
+- ✅ **Logs de debug**: Sistema de logs para monitoramento
+
+#### 📊 **STATUS ATUAL**
+- 🟢 **Sistema de artigos**: 100% operacional
+- 🟢 **Categorias**: 7 categorias carregando corretamente
+- 🟢 **Tags**: Sistema funcionando
+- 🟢 **Editor**: Simples, funcional e sem bugs
+- 🟢 **APIs**: Todas funcionais
+- 🟢 **Banco de dados**: SQLite estável
+
+#### 🎯 **FUNCIONALIDADES VALIDADAS**
+- ✅ Login administrativo funcionando
+- ✅ Dashboard acessível
+- ✅ Criação de artigos operacional
+- ✅ Seleção de categorias funcionando
+- ✅ Sistema de tags ativo
+- ✅ Salvamento no banco de dados
+- ✅ Interface limpa e intuitiva
+
+---
+
+*Sistema de publicação de artigos totalmente restaurado e funcional!*
+

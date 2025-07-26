@@ -54,9 +54,6 @@ export async function GET(request: NextRequest) {
     
     try {
       // Tentar carregar do banco primeiro
-      await prisma.$connect();
-      console.log('Conexão com banco estabelecida');
-      
       categories = await prisma.category.findMany({
         orderBy: {
           name: 'asc',
@@ -64,17 +61,22 @@ export async function GET(request: NextRequest) {
       });
       
       console.log('Categorias encontradas no banco:', categories.length);
+      
+      // Se encontrou categorias no banco, usar elas
+      if (categories.length > 0) {
+        console.log('Usando categorias do banco de dados');
+        return NextResponse.json({
+          categories: categories,
+          total: categories.length
+        });
+      }
     } catch (dbError) {
-      console.log('Erro ao acessar banco, usando categorias hardcoded:', dbError.message);
+      console.log('Erro ao acessar banco:', dbError);
     }
 
     // Se não encontrar categorias no banco, usar as hardcoded
-    if (categories.length === 0) {
-      console.log('Usando categorias hardcoded');
-      categories = HARDCODED_CATEGORIES;
-    }
-
-    console.log('Categorias retornadas:', categories);
+    console.log('Usando categorias hardcoded como fallback');
+    categories = HARDCODED_CATEGORIES;
 
     return NextResponse.json({
       categories: categories,

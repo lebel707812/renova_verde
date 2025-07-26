@@ -1,31 +1,37 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Article, Category, Tag } from '@/types';
+import { useState, useEffect } from 'react';
 
-interface ArticleEditorProps {
-  article?: Article;
-  onSave: (articleData: Partial<Article>) => Promise<void>;
-  onCancel: () => void;
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
 }
 
-export default function ArticleEditor({ article, onSave, onCancel }: ArticleEditorProps) {
-  const [title, setTitle] = useState(article?.title || '');
-  const [slug, setSlug] = useState(article?.slug || '');
-  const [excerpt, setExcerpt] = useState(article?.excerpt || '');
-  const [content, setContent] = useState(article?.content || '');
-  const [featuredImage, setFeaturedImage] = useState(article?.featuredImage || '');
-  const [categoryId, setCategoryId] = useState(article?.categoryId || '');
-  const [selectedTags, setSelectedTags] = useState<string[]>(article?.tags?.map(t => t.id) || []);
-  const [status, setStatus] = useState<'draft' | 'published'>(article?.status || 'draft');
-  const [loading, setLoading] = useState(false);
-  const [imageUploading, setImageUploading] = useState(false);
+interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface SimpleArticleEditorProps {
+  onSave: (articleData: any) => Promise<void>;
+  onCancel: () => void;
+  loading?: boolean;
+}
+
+export default function SimpleArticleEditor({ onSave, onCancel, loading = false }: SimpleArticleEditorProps) {
+  const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [excerpt, setExcerpt] = useState('');
+  const [content, setContent] = useState('');
+  const [categoryId, setCategoryId] = useState('');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [status, setStatus] = useState<'draft' | 'published'>('draft');
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [newTag, setNewTag] = useState('');
-  
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Carregar categorias e tags
   useEffect(() => {
@@ -43,7 +49,10 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
       if (categoriesRes.ok) {
         const categoriesData = await categoriesRes.json();
         console.log('Categorias encontradas no banco:', categoriesData.categories?.length || 0);
-        setCategories(categoriesData.categories || []);
+        if (categoriesData.categories && categoriesData.categories.length > 0) {
+          console.log('Usando categorias do banco de dados');
+          setCategories(categoriesData.categories);
+        }
       }
       
       if (tagsRes.ok) {
@@ -58,7 +67,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
 
   // Gerar slug automaticamente a partir do título
   useEffect(() => {
-    if (title && !article) {
+    if (title) {
       const generatedSlug = title
         .toLowerCase()
         .normalize('NFD')
@@ -69,46 +78,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
         .trim();
       setSlug(generatedSlug);
     }
-  }, [title, article]);
-
-  const handleImageUpload = async (file: File) => {
-    setImageUploading(true);
-    const formData = new FormData();
-    formData.append('image', file);
-
-    try {
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-        },
-        body: formData
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        return data.url;
-      } else {
-        throw new Error('Erro no upload');
-      }
-    } catch (error) {
-      console.error('Erro no upload:', error);
-      alert('Erro ao fazer upload da imagem');
-      return null;
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
-  const handleFeaturedImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = await handleImageUpload(file);
-      if (url) {
-        setFeaturedImage(url);
-      }
-    }
-  };
+  }, [title]);
 
   const addTag = () => {
     if (newTag.trim()) {
@@ -135,31 +105,21 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
       return;
     }
 
-    setLoading(true);
+    const selectedCategory = categories.find(c => c.id === categoryId);
+    const articleTags = tags.filter(t => selectedTags.includes(t.id));
     
-    try {
-      const selectedCategory = categories.find(c => c.id === categoryId);
-      const articleTags = tags.filter(t => selectedTags.includes(t.id));
-      
-      const articleData: Partial<Article> = {
-        title: title.trim(),
-        slug: slug.trim(),
-        excerpt: excerpt.trim(),
-        content: content.trim(),
-        featuredImage: featuredImage || undefined,
-        categoryId: categoryId,
-        tags: articleTags,
-        status,
-        readingTime: Math.ceil(content.split(' ').length / 200), // Estimativa de tempo de leitura
-      };
+    const articleData = {
+      title: title.trim(),
+      slug: slug.trim(),
+      excerpt: excerpt.trim(),
+      content: content.trim(),
+      categoryId: categoryId,
+      tags: articleTags,
+      status,
+      readingTime: Math.ceil(content.split(' ').length / 200),
+    };
 
-      await onSave(articleData);
-    } catch (error) {
-      console.error('Erro ao salvar artigo:', error);
-      alert('Erro ao salvar artigo');
-    } finally {
-      setLoading(false);
-    }
+    await onSave(articleData);
   };
 
   return (
@@ -168,7 +128,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">
-              {article ? 'Editar Artigo' : 'Novo Artigo'}
+              Novo Artigo
             </h2>
             <div className="flex space-x-2">
               <button
@@ -229,40 +189,6 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               placeholder="Breve descrição do artigo"
             />
-          </div>
-
-          {/* Imagem destacada */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Imagem Destacada
-            </label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFeaturedImageUpload}
-                accept="image/*"
-                className="hidden"
-              />
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={imageUploading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-              >
-                {imageUploading ? 'Enviando...' : 'Escolher Imagem'}
-              </button>
-              {featuredImage && (
-                <div className="flex items-center space-x-2">
-                  <img src={featuredImage} alt="Preview" className="h-10 w-10 object-cover rounded" />
-                  <button
-                    onClick={() => setFeaturedImage('')}
-                    className="text-red-600 hover:text-red-800 text-sm"
-                  >
-                    Remover
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Categoria e Tags */}
@@ -344,7 +270,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
             </select>
           </div>
 
-          {/* Editor de Conteúdo Simples */}
+          {/* Editor de Conteúdo */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Conteúdo *
