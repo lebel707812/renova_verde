@@ -1,3 +1,4 @@
+import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import FeaturedArticles from '@/components/landing/FeaturedArticles';
 import NewsletterSignup from '@/components/landing/NewsletterSignup';
@@ -5,6 +6,9 @@ import NewsletterSignup from '@/components/landing/NewsletterSignup';
 export default function Home() {
   return (
     <main className="min-h-screen">
+      {/* Header */}
+      <Header />
+      
       {/* Hero Section */}
       <HeroSection />
       
