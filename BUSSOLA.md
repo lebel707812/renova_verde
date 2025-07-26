@@ -505,3 +505,23 @@ Para dúvidas, sugestões ou parcerias:
 
 *Última atualização: 26 de Janeiro de 2024 - Melhorias Visuais Concluídas*
 
+
+### **v2.1.1 - Correções Finais de UX** (26/01/2024)
+
+#### 🔧 **CORREÇÕES IMPLEMENTADAS**
+- ✅ **Página Contato**: Confirmado que já possui Header e Footer (Layout implementado)
+- ✅ **Link Newsletter no Header**: Corrigido de `#newsletter` para `/#newsletter`
+  - Agora funciona corretamente de qualquer página
+  - Sempre redireciona para a seção de newsletter na página inicial
+  - Funciona tanto no menu desktop quanto mobile
+
+#### 📊 **STATUS FINAL**
+- 🟢 **TODAS as páginas** agora possuem Header e Footer
+- 🟢 **TODOS os links** da Newsletter funcionam corretamente
+- 🟢 **Build** sem erros críticos
+- 🟢 **UX** completamente otimizada
+
+---
+
+*Projeto 100% funcional e pronto para a próxima fase de desenvolvimento!*
+

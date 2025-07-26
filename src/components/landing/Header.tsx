@@ -99,7 +99,7 @@ export default function Header() {
 
             {/* Newsletter CTA */}
             <Link
-              href="#newsletter"
+              href="/#newsletter"
               className="hidden lg:inline-flex bg-primary hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200"
             >
               Newsletter
@@ -162,7 +162,7 @@ export default function Header() {
                 Contato
               </Link>
               <Link
-                href="#newsletter"
+                href="/#newsletter"
                 className="inline-flex bg-primary hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 w-fit"
                 onClick={() => setIsMenuOpen(false)}
               >
