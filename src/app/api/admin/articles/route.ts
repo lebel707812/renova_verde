@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
         seoDescription: articleData.excerpt || '',
         seoKeywords: articleData.tags?.map((t: any) => t.name).join(',') || '',
         authorId: author.id,
-        categoryId: articleData.category?.id || 'jardinagem-urbana',
+        categoryId: articleData.categoryId || 'jardinagem-urbana',
         publishedAt: articleData.status === 'published' ? new Date() : null,
       },
       include: {

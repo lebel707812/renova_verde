@@ -1,0 +1,56 @@
+/* Customização do ReactQuill para melhor visibilidade */
+.ql-editor {
+  color: #111827 !important; /* text-gray-900 */
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+}
+
+.ql-editor p {
+  color: #111827 !important;
+}
+
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4,
+.ql-editor h5,
+.ql-editor h6 {
+  color: #111827 !important;
+}
+
+.ql-editor strong {
+  color: #111827 !important;
+}
+
+.ql-editor em {
+  color: #111827 !important;
+}
+
+.ql-editor ul,
+.ql-editor ol {
+  color: #111827 !important;
+}
+
+.ql-editor li {
+  color: #111827 !important;
+}
+
+.ql-editor blockquote {
+  color: #374151 !important; /* text-gray-700 */
+}
+
+.ql-editor code {
+  color: #111827 !important;
+  background-color: #f3f4f6 !important;
+}
+
+.ql-editor pre {
+  color: #111827 !important;
+  background-color: #f3f4f6 !important;
+}
+
+/* Placeholder */
+.ql-editor.ql-blank::before {
+  color: #9ca3af !important; /* text-gray-400 */
+}
+

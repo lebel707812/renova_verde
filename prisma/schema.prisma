@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,101 +8,80 @@ datasource db {
 }
 
 model Author {
-  id       String @id @default(cuid())
-  name     String
-  bio      String?
-  avatar   String?
-  twitter  String?
-  linkedin String?
-  website  String?
-  
-  articles Article[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  id        String    @id @default(cuid())
+  name      String
+  bio       String?
+  avatar    String?
+  twitter   String?
+  linkedin  String?
+  website   String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  articles  Article[]
+
   @@map("authors")
 }
 
 model Category {
-  id          String @id @default(cuid())
-  name        String @unique
-  slug        String @unique
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
   description String?
   color       String?
   icon        String?
-  
-  articles Article[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
+
   @@map("categories")
 }
 
 model Tag {
-  id   String @id @default(cuid())
-  name String @unique
-  slug String @unique
-  
-  articles ArticleTag[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+  id        String       @id @default(cuid())
+  name      String       @unique
+  slug      String       @unique
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  articles  ArticleTag[]
+
   @@map("tags")
 }
 
 model Article {
-  id            String        @id @default(cuid())
-  title         String
-  slug          String        @unique
-  excerpt       String?
-  content       String
-  featuredImage String?
-  readingTime   Int           @default(5)
-  views         Int           @default(0)
-  likes         Int           @default(0)
-  status        ArticleStatus @default(DRAFT)
-  
-  // SEO fields
+  id             String       @id @default(cuid())
+  title          String
+  slug           String       @unique
+  excerpt        String?
+  content        String
+  featuredImage  String?
+  readingTime    Int          @default(5)
+  views          Int          @default(0)
+  likes          Int          @default(0)
+  status         String       @default("DRAFT")
   seoTitle       String?
   seoDescription String?
   seoKeywords    String?
   ogImage        String?
   canonicalUrl   String?
-  noIndex        Boolean @default(false)
-  
-  // Relations
-  authorId   String
-  author     Author @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  tags ArticleTag[]
-  
-  publishedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  noIndex        Boolean      @default(false)
+  authorId       String
+  categoryId     String
+  publishedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  tags           ArticleTag[]
+  category       Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  author         Author       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
   @@map("articles")
 }
 
 model ArticleTag {
   articleId String
   tagId     String
-  
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
-  
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
   @@id([articleId, tagId])
   @@map("article_tags")
 }
-
-enum ArticleStatus {
-  DRAFT
-  PUBLISHED
-  ARCHIVED
-}
-

@@ -10,6 +10,7 @@ import { Article, Category, Tag } from '@/types';
 // Importação dinâmica do ReactQuill para evitar problemas de SSR
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 import 'react-quill/dist/quill.snow.css';
+import '@/styles/quill-custom.css';
 
 interface ArticleEditorProps {
   article?: Article;
@@ -399,7 +400,7 @@ export default function ArticleEditor({ article, onSave, onCancel }: ArticleEdit
                   <textarea
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="w-full h-96 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm"
+                    className="w-full h-96 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm text-gray-900"
                     placeholder="Digite o conteúdo em Markdown"
                   />
                 </div>
