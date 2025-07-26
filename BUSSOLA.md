@@ -314,10 +314,7 @@ Para dúvidas, sugestões ou parcerias:
 - Dados iniciais (autores e categorias)
 
 **Corrigido:**
-- Migração de PostgreSQL para SQLite
-- Compatibilidade do schema Prisma com SQLite
-- Validação de tokens no client e server
-- Redirecionamento após login
+- Validação de tokens no `useAuth` para acesso ao dashboard
 
 **Técnico:**
 - Configuração de ambiente `.env.local`
