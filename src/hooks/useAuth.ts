@@ -10,32 +10,29 @@ export function useAuth() {
     const token = localStorage.getItem('admin_token');
     
     if (token) {
-      // Verificar se o token é válido fazendo uma requisição para uma rota protegida
-      fetch('/api/admin/articles', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        if (response.ok) {
+      try {
+        // Verificar se o token é válido decodificando-o
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const currentTime = Math.floor(Date.now() / 1000);
+        
+        if (payload.exp && payload.exp > currentTime) {
+          // Token válido e não expirado
           setIsAuthenticated(true);
         } else {
-          // Token inválido, remover do localStorage
+          // Token expirado
           localStorage.removeItem('admin_token');
           setIsAuthenticated(false);
         }
-      })
-      .catch(() => {
+      } catch (error) {
+        // Token inválido
         localStorage.removeItem('admin_token');
         setIsAuthenticated(false);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      }
     } else {
       setIsAuthenticated(false);
-      setIsLoading(false);
     }
+    
+    setIsLoading(false);
   }, []);
 
   const logout = () => {
