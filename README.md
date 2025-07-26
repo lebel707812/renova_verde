@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Renova Verde Hub 🌱
 
-## Getting Started
+Landing page moderna e responsiva para o Renova Verde Hub, desenvolvida com Next.js 14, TypeScript e Tailwind CSS.
 
-First, run the development server:
+## 🚀 Tecnologias
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 14** - Framework React com App Router
+- **TypeScript** - Tipagem estática
+- **Tailwind CSS** - Framework CSS utilitário
+- **Lucide React** - Ícones modernos
+- **Responsive Design** - Mobile-first
+
+## 🎨 Design
+
+- **Cor Primária**: Dark Green (#1a3f32)
+- **Abordagem**: Mobile-first
+- **Componentes**: Modulares e reutilizáveis
+
+## 📱 Seções
+
+### Hero Section
+- Título principal: "Sustentabilidade Inteligente para Seu Lar"
+- Subtítulo com descrição do conteúdo
+- CTA para explorar artigos e newsletter
+- Imagem de fundo com jardim vertical
+- Estatísticas em destaque
+
+### Destaque de Artigos
+- 3 cards de artigos em destaque
+- Componente ArticleCard reutilizável
+- Badges de categoria
+- Links otimizados com next/link
+- Seção de estatísticas
+
+### Newsletter
+- Componente NewsletterSignup com variant compact
+- Formulário com validação
+- Ícone de email integrado
+- Benefícios da newsletter
+
+### Footer
+- Links organizados por categoria
+- Redes sociais
+- Informações legais
+
+## 🔧 Estrutura do Projeto
+
+```
+src/
+├── app/
+│   ├── layout.tsx          # Layout principal com SEO
+│   ├── page.tsx            # Página inicial
+│   └── globals.css         # Estilos globais
+└── components/
+    └── landing/
+        ├── HeroSection.tsx      # Seção hero
+        ├── FeaturedArticles.tsx # Artigos em destaque
+        ├── ArticleCard.tsx      # Card de artigo
+        └── NewsletterSignup.tsx # Formulário newsletter
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Como Executar
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Instalar dependências**:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Executar em desenvolvimento**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+3. **Build para produção**:
+   ```bash
+   npm run build
+   npm start
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+## 🔍 SEO e Performance
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Meta tags** dinâmicas otimizadas
+- **Schema.org** structured data
+- **Open Graph** e Twitter Cards
+- **Next.js Image** para otimização automática
+- **Links otimizados** com next/link
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🔗 Integrações Futuras
 
-## Deploy on Vercel
+Os seguintes pontos estão marcados com comentários TODO para futuras integrações:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **API de Artigos**: Integração com CMS ou API de blog
+- **API de Newsletter**: Serviço de email marketing
+- **Redes Sociais**: Links reais para perfis sociais
+- **Analytics**: Google Analytics ou similar
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 Componentes
+
+### ArticleCard
+Componente reutilizável para exibir artigos com:
+- Imagem otimizada
+- Badge de categoria
+- Título e excerpt
+- Link para leitura
+
+### NewsletterSignup
+Componente de newsletter com duas variantes:
+- `default`: Versão completa
+- `compact`: Versão compacta para landing page
+
+## 🎯 Próximos Passos
+
+1. Integrar com API de artigos
+2. Implementar sistema de newsletter
+3. Adicionar páginas internas (/blog, /sobre, etc.)
+4. Configurar analytics
+5. Otimizar para SEO avançado
+
+## 📄 Licença
+
+Este projeto foi desenvolvido para o Renova Verde Hub.
+
