@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import SimpleArticleEditor from '@/components/SimpleArticleEditor';
+import { articlesAPI } from '@/lib/api';
 
 export default function NewArticlePage() {
   const router = useRouter();
@@ -11,25 +12,12 @@ export default function NewArticlePage() {
   const handleSave = async (articleData: any) => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/articles', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('admin_token')}`
-        },
-        body: JSON.stringify(articleData)
-      });
-
-      if (response.ok) {
-        alert('Artigo criado com sucesso!');
-        router.push('/admin/dashboard');
-      } else {
-        const error = await response.json();
-        alert(`Erro ao criar artigo: ${error.message}`);
-      }
-    } catch (error) {
+      await articlesAPI.create(articleData);
+      alert('Artigo criado com sucesso!');
+      router.push('/admin/dashboard');
+    } catch (error: any) {
       console.error('Erro ao salvar artigo:', error);
-      alert('Erro ao salvar artigo');
+      alert(`Erro ao criar artigo: ${error.message}`);
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -9,6 +10,7 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,24 +18,13 @@ export default function AdminLogin() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const result = await login(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Salvar token no localStorage e cookie
-        localStorage.setItem('admin_token', data.token);
-        document.cookie = `admin_token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
+      if (result.success) {
         // Redirecionar para o painel admin
         router.push('/admin/dashboard');
       } else {
-        setError(data.message || 'Erro ao fazer login');
+        setError(result.error || 'Erro ao fazer login');
       }
     } catch (err) {
       setError('Erro de conexão');

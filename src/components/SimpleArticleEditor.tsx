@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { categoriesAPI, tagsAPI } from '@/lib/api';
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
   slug: string;
 }
 
 interface Tag {
-  id: string;
+  id: number;
   name: string;
   slug: string;
 }
@@ -26,13 +27,12 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
   const [slug, setSlug] = useState(article?.slug || '');
   const [excerpt, setExcerpt] = useState(article?.excerpt || '');
   const [content, setContent] = useState(article?.content || '');
-  const [categoryId, setCategoryId] = useState(article?.categoryId || '');
-  const [selectedTags, setSelectedTags] = useState<string[]>(article?.tags?.map((t: any) => t.id) || []);
+  const [categoryId, setCategoryId] = useState(article?.category_id || '');
+  const [selectedTags, setSelectedTags] = useState<number[]>(article?.tags?.map((t: any) => t.id) || []);
   const [status, setStatus] = useState<'draft' | 'published'>(article?.status || 'draft');
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
-  const [newTag, setNewTag] = useState('');
 
   // Carregar categorias e tags
   useEffect(() => {
@@ -41,28 +41,21 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
 
   const loadCategoriesAndTags = async () => {
     try {
-      console.log('Tentando carregar categorias...');
-      const [categoriesRes, tagsRes] = await Promise.all([
-        fetch('/api/admin/categories'),
-        fetch('/api/admin/tags')
+      const [categoriesData, tagsData] = await Promise.all([
+        categoriesAPI.getAll(),
+        tagsAPI.getAll()
       ]);
       
-      if (categoriesRes.ok) {
-        const categoriesData = await categoriesRes.json();
-        console.log('Categorias encontradas no banco:', categoriesData.categories?.length || 0);
-        if (categoriesData.categories && categoriesData.categories.length > 0) {
-          console.log('Usando categorias do banco de dados');
-          setCategories(categoriesData.categories);
-        }
-      }
-      
-      if (tagsRes.ok) {
-        const tagsData = await tagsRes.json();
-        console.log('Tags encontradas no banco:', tagsData.tags?.length || 0);
-        setTags(tagsData.tags || []);
-      }
+      setCategories(categoriesData);
+      setTags(tagsData);
     } catch (error) {
       console.error('Erro ao carregar categorias e tags:', error);
+      // Fallback para categorias hardcoded
+      setCategories([
+        { id: 1, name: 'Jardinagem Urbana', slug: 'jardinagem-urbana' },
+        { id: 2, name: 'Energia Renovável', slug: 'energia-renovavel' },
+        { id: 3, name: 'Reformas Ecológicas', slug: 'reformas-ecologicas' }
+      ]);
     }
   };
 
@@ -81,20 +74,6 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
     }
   }, [title]);
 
-  const addTag = () => {
-    if (newTag.trim()) {
-      const tagSlug = newTag.toLowerCase().replace(/\s+/g, '-');
-      const newTagObj: Tag = {
-        id: `tag-${Date.now()}`,
-        name: newTag.trim(),
-        slug: tagSlug
-      };
-      setTags([...tags, newTagObj]);
-      setSelectedTags([...selectedTags, newTagObj.id]);
-      setNewTag('');
-    }
-  };
-
   const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
       alert('Título e conteúdo são obrigatórios');
@@ -105,19 +84,15 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
       alert('Categoria é obrigatória');
       return;
     }
-
-    const selectedCategory = categories.find(c => c.id === categoryId);
-    const articleTags = tags.filter(t => selectedTags.includes(t.id));
     
     const articleData = {
       title: title.trim(),
       slug: slug.trim(),
       excerpt: excerpt.trim(),
       content: content.trim(),
-      categoryId: categoryId,
-      tags: articleTags,
+      category_id: parseInt(categoryId.toString()),
+      tag_ids: selectedTags,
       status,
-      readingTime: Math.ceil(content.split(' ').length / 200),
     };
 
     await onSave(articleData);
@@ -217,43 +192,24 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
                 Tags
               </label>
               <div className="space-y-2">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addTag()}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Nova tag"
-                  />
-                  <button
-                    onClick={addTag}
-                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
-                  >
-                    Adicionar
-                  </button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <label key={tag.id} className="flex items-center space-x-1">
-                      <input
-                        type="checkbox"
-                        checked={selectedTags.includes(tag.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedTags([...selectedTags, tag.id]);
-                          } else {
-                            setSelectedTags(selectedTags.filter(id => id !== tag.id));
-                          }
-                        }}
-                        className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                      />
-                      <span className="text-sm text-gray-700">{tag.name}</span>
-                    </label>
-                  ))}
-                </div>
+                {tags.map((tag) => (
+                  <label key={tag.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedTags.includes(tag.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedTags([...selectedTags, tag.id]);
+                        } else {
+                          setSelectedTags(selectedTags.filter(id => id !== tag.id));
+                        }
+                      }}
+                      className="mr-2"
+                    />
+                    {tag.name}
+                  </label>
+                ))}
               </div>
-            </div>
           </div>
 
           {/* Status */}
@@ -280,7 +236,7 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={15}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-black"
               placeholder="Digite o conteúdo do artigo aqui. Você pode usar HTML ou Markdown."
             />
             <p className="text-sm text-gray-500 mt-1">
