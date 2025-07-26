@@ -15,19 +15,20 @@ interface Tag {
 }
 
 interface SimpleArticleEditorProps {
+  article?: any; // Artigo existente para edição
   onSave: (articleData: any) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
 
-export default function SimpleArticleEditor({ onSave, onCancel, loading = false }: SimpleArticleEditorProps) {
-  const [title, setTitle] = useState('');
-  const [slug, setSlug] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [categoryId, setCategoryId] = useState('');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [status, setStatus] = useState<'draft' | 'published'>('draft');
+export default function SimpleArticleEditor({ article, onSave, onCancel, loading = false }: SimpleArticleEditorProps) {
+  const [title, setTitle] = useState(article?.title || '');
+  const [slug, setSlug] = useState(article?.slug || '');
+  const [excerpt, setExcerpt] = useState(article?.excerpt || '');
+  const [content, setContent] = useState(article?.content || '');
+  const [categoryId, setCategoryId] = useState(article?.categoryId || '');
+  const [selectedTags, setSelectedTags] = useState<string[]>(article?.tags?.map((t: any) => t.id) || []);
+  const [status, setStatus] = useState<'draft' | 'published'>(article?.status || 'draft');
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -128,7 +129,7 @@ export default function SimpleArticleEditor({ onSave, onCancel, loading = false 
         <div className="px-6 py-4 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-900">
-              Novo Artigo
+              {article ? 'Editar Artigo' : 'Novo Artigo'}
             </h2>
             <div className="flex space-x-2">
               <button

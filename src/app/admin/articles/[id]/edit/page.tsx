@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { isAuthenticated } from '@/lib/auth';
-import ArticleEditor from '@/components/ArticleEditor';
+import SimpleArticleEditor from '@/components/SimpleArticleEditor';
 import { Article } from '@/types';
 
 export default function EditArticlePage() {
@@ -92,7 +92,7 @@ export default function EditArticlePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ArticleEditor
+      <SimpleArticleEditor
         article={article}
         onSave={handleSave}
         onCancel={handleCancel}
