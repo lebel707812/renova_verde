@@ -525,3 +525,23 @@ Para dúvidas, sugestões ou parcerias:
 
 *Projeto 100% funcional e pronto para a próxima fase de desenvolvimento!*
 
+
+
+### **v2.1.2 - Correções de Hidratação e Links** (26/01/2024)
+
+#### 🔧 **CORREÇÕES IMPLEMENTADAS**
+- ✅ **Página Contato**: Problemas de hidratação resolvidos.
+  - `ContactForm` agora é importado dinamicamente de forma correta.
+  - Ícones do Lucide React importados corretamente na `page.tsx`.
+- ✅ **Link Newsletter no Header**: Corrigido para `/#newsletter`.
+  - Garante que o link funcione de qualquer página, direcionando para a seção de newsletter na página inicial.
+
+#### 📊 **STATUS FINAL**
+- 🟢 **Página Contato** totalmente funcional, sem erros de hidratação.
+- 🟢 **Links da Newsletter** no Header e menu mobile funcionando corretamente.
+- 🟢 **Build** sem erros críticos.
+
+---
+
+*Projeto 100% funcional e pronto para a próxima fase de desenvolvimento!*
+
