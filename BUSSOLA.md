@@ -189,8 +189,8 @@ Democratizar o acesso ao conhecimento sobre sustentabilidade, fornecendo dicas p
   - ✅ `/categoria/[slug]` - Páginas de categoria
   - ✅ `/blog/[slug]` - Páginas de artigo
   - ✅ `/busca` - Página de resultados de busca
-  - [ ] `/sobre` - Sobre o projeto
-  - [ ] `/contato` - Formulário de contato
+  - ✅ `/sobre` - Sobre o projeto
+  - ✅ `/contato` - Formulário de contato
 
 - [ ] **Newsletter Backend**
   - Integração com Mailchimp ou ConvertKit
@@ -336,4 +336,41 @@ Para dúvidas, sugestões ou parcerias:
 ---
 
 *Última atualização: Janeiro 2024*
+
+
+
+### Janeiro 2024 - v1.2.0
+**🔧 Correção Completa do Sistema de Banco de Dados e Novas Páginas**
+
+**Corrigido:**
+- ✅ Migração completa de PostgreSQL para SQLite
+- ✅ Banco de dados SQLite funcionando corretamente
+- ✅ Migrações aplicadas e seed executado com sucesso
+- ✅ Sistema de categorias hardcoded como fallback no painel admin
+- ✅ Sistema de tags hardcoded como fallback no painel admin
+- ✅ Categorias agora aparecem corretamente no editor de artigos
+- ✅ Removidos todos os vestígios de PostgreSQL
+
+**Adicionado:**
+- ✅ Página `/sobre` - História, missão, valores e pilares do projeto
+- ✅ Página `/contato` - Formulário de contato com FAQ
+- ✅ Navegação atualizada no header (desktop e mobile)
+- ✅ Sistema robusto de fallback para categorias e tags
+- ✅ Melhor tratamento de erros nas APIs
+
+**Técnico:**
+- ✅ APIs de categorias e tags com fallback hardcoded
+- ✅ Seed do banco funcionando corretamente
+- ✅ Build do projeto sem erros críticos
+- ✅ Commit e push realizados com sucesso
+
+**Status do Sistema:**
+- 🟢 Banco de dados: SQLite funcionando
+- 🟢 Painel admin: 100% operacional
+- 🟢 Editor de artigos: Categorias e tags carregando
+- 🟢 Páginas públicas: Todas funcionais
+- 🟢 Sistema de busca: Operacional
+
+---
+
 

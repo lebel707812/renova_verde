@@ -50,12 +50,6 @@ export default function Header() {
               Blog
             </Link>
             <Link 
-              href="/categorias" 
-              className="text-gray-700 hover:text-primary font-medium transition-colors duration-200"
-            >
-              Categorias
-            </Link>
-            <Link 
               href="/sobre" 
               className="text-gray-700 hover:text-primary font-medium transition-colors duration-200"
             >
@@ -152,13 +146,6 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Blog
-              </Link>
-              <Link 
-                href="/categorias" 
-                className="text-gray-700 hover:text-primary font-medium transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Categorias
               </Link>
               <Link 
                 href="/sobre" 
