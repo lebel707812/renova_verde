@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Metadata } from 'next';
 import { Mail, Phone, MapPin, Send, MessageCircle, Clock, CheckCircle } from 'lucide-react';
+import Layout from '@/components/layout/Layout';
 
 export default function ContatoPage() {
   const [formData, setFormData] = useState({
@@ -65,7 +66,8 @@ export default function ContatoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+      <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-green-800 to-green-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -325,7 +327,8 @@ export default function ContatoPage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </Layout>
   );
 }
 

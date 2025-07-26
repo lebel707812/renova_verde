@@ -432,3 +432,76 @@ Para dúvidas, sugestões ou parcerias:
 
 ---
 
+
+
+---
+
+## 📝 CHANGELOG - MELHORIAS VISUAIS E UX
+
+### **v2.1.0 - Melhorias Visuais e UX** (26/01/2024)
+
+#### 🎨 **ALTERAÇÕES VISUAIS IMPLEMENTADAS**
+
+##### **Layout Unificado**
+- ✅ Header e Footer adicionados em TODAS as páginas
+- ✅ Componente Layout criado para consistência
+- ✅ Navegação unificada e responsiva
+
+##### **Página Inicial (/)**
+- ✅ **Estatísticas removidas**: Seção "500+ Artigos, 50k+ Leitores..." removida
+- ✅ **Newsletter com background diferenciado**: Mudança de `bg-white` para `bg-gray-100`
+- ✅ **Espaçamento do botão**: "Ver Todos os Artigos" com margem adequada (`mb-12`)
+- ✅ **Cards totalmente clicáveis**: Artigos clicáveis na imagem, título e texto completo
+
+##### **Página Blog (/blog)**
+- ✅ **Footer adicionado**: Página agora tem header E footer
+- ✅ **Link da newsletter corrigido**: Botão redireciona para `/#newsletter`
+
+##### **Página Sobre (/sobre)**
+- ✅ **Header e Footer adicionados**: Layout completo
+- ✅ **Estatísticas fictícias removidas**: Seção "Nosso Impacto" com números falsos removida
+
+##### **Página Contato (/contato)**
+- ✅ **Header e Footer adicionados**: Layout completo
+
+##### **Página Busca (/busca)**
+- ✅ **Footer adicionado**: Página agora tem header E footer
+
+##### **Novas Páginas Legais**
+- ✅ **Política de Privacidade (/privacidade)**: Página completa com LGPD
+- ✅ **Termos de Uso (/termos)**: Página detalhada com direitos e responsabilidades
+- ✅ **Links do Footer funcionais**: Redirecionamento correto
+
+#### 🔧 **CORREÇÕES TÉCNICAS**
+- ✅ Build funcionando sem erros críticos
+- ✅ Componente Footer separado e reutilizável
+- ✅ Imports otimizados e estrutura limpa
+- ✅ TypeScript sem erros de compilação
+
+#### 📊 **MELHORIAS DE UX**
+- ✅ **Navegação consistente**: Todas as páginas seguem o mesmo padrão
+- ✅ **Clicabilidade melhorada**: Cards de artigos com área clicável maior
+- ✅ **Visual mais limpo**: Remoção de dados fictícios e estatísticas falsas
+- ✅ **Newsletter acessível**: Link funcional em todas as páginas
+- ✅ **Conformidade legal**: Páginas de privacidade e termos implementadas
+
+---
+
+## 🎯 PRÓXIMOS PASSOS SUGERIDOS
+
+### **FASE 3 - CONTEÚDO E FUNCIONALIDADES**
+1. **Newsletter Backend**: Integração com Mailchimp/ConvertKit
+2. **Criação de Conteúdo**: 20 artigos iniciais sobre sustentabilidade
+3. **Sistema de Busca**: Funcionalidade real de pesquisa
+4. **Comentários**: Sistema de comentários nos artigos
+
+### **FASE 4 - ANALYTICS E OTIMIZAÇÃO**
+1. **Google Analytics**: Configuração completa
+2. **Google Search Console**: Submissão do sitemap
+3. **Testes de Performance**: Lighthouse em produção
+4. **Monitoramento**: Alertas e métricas
+
+---
+
+*Última atualização: 26 de Janeiro de 2024 - Melhorias Visuais Concluídas*
+

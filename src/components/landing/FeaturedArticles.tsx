@@ -50,7 +50,7 @@ export default function FeaturedArticles() {
         </div>
         
         {/* Articles Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {featuredArticles.map((article, index) => (
             <ArticleCard
               key={article.id}
@@ -85,28 +85,6 @@ export default function FeaturedArticles() {
               />
             </svg>
           </a>
-        </div>
-        
-        {/* Stats Section */}
-        <div className="mt-16 pt-16 border-t border-gray-200">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">500+</div>
-              <div className="text-gray-600 text-sm lg:text-base">Artigos Publicados</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">50k+</div>
-              <div className="text-gray-600 text-sm lg:text-base">Leitores Mensais</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">1M+</div>
-              <div className="text-gray-600 text-sm lg:text-base">Visualizações</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl lg:text-3xl font-bold text-primary mb-2">95%</div>
-              <div className="text-gray-600 text-sm lg:text-base">Satisfação</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

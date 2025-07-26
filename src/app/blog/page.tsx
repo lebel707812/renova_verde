@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Search, Calendar, Clock, User, Tag as TagIcon } from 'lucide-react';
 
 import Header from '@/components/landing/Header';
+import Footer from '@/components/landing/Footer';
 import { mockArticles, mockCategories, mockTags } from '@/lib/mock-data';
 import { formatDate, formatRelativeDate } from '@/lib/utils';
 
@@ -236,7 +237,7 @@ export default function BlogPage() {
               Receba nossos melhores conteúdos sobre sustentabilidade diretamente no seu email
             </p>
             <Link
-              href="#newsletter"
+              href="/#newsletter"
               className="inline-block bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Inscrever-se na Newsletter
@@ -244,6 +245,8 @@ export default function BlogPage() {
           </div>
         </section>
       </main>
+      
+      <Footer />
     </>
   );
 }

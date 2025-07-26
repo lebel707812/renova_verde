@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { Leaf, Users, Target, Heart, Award, Lightbulb } from 'lucide-react';
+import Layout from '@/components/layout/Layout';
 
 export const metadata: Metadata = {
   title: 'Sobre o Renova Verde Hub | Nossa Missão Sustentável',
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
 
 export default function SobrePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
+      <div className="bg-gray-50">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-green-800 to-green-600 text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -181,39 +183,6 @@ export default function SobrePage() {
         </div>
       </section>
 
-      {/* Nossos Números */}
-      <section className="py-16 bg-green-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Nosso Impacto
-            </h2>
-            <p className="text-xl text-green-100">
-              Números que mostram o crescimento da nossa comunidade sustentável.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold mb-2">10k+</div>
-              <div className="text-green-100">Visitantes mensais</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">50+</div>
-              <div className="text-green-100">Artigos publicados</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">1k+</div>
-              <div className="text-green-100">Inscritos na newsletter</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">95%</div>
-              <div className="text-green-100">Satisfação dos leitores</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Call to Action */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -240,7 +209,8 @@ export default function SobrePage() {
           </div>
         </div>
       </section>
-    </div>
+      </div>
+    </Layout>
   );
 }
 
