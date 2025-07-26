@@ -78,7 +78,7 @@ export async function seedDatabase() {
           status: mockArticle.status === 'published' ? 'PUBLISHED' : 'DRAFT',
           seoTitle: mockArticle.seo.title,
           seoDescription: mockArticle.seo.description,
-          seoKeywords: mockArticle.seo.keywords || [],
+          seoKeywords: Array.isArray(mockArticle.seo.keywords) ? mockArticle.seo.keywords.join(', ') : mockArticle.seo.keywords || '',
           ogImage: mockArticle.seo.ogImage,
           canonicalUrl: mockArticle.seo.canonicalUrl,
           noIndex: mockArticle.seo.noIndex || false,
