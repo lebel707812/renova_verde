@@ -316,6 +316,11 @@ Para dúvidas, sugestões ou parcerias:
 **Corrigido:**
 - Validação de tokens no `useAuth` para acesso ao dashboard
 - Persistência da sessão ao navegar entre páginas administrativas (`/admin/articles`, `/admin/articles/new`)
+- **EDITOR DE ARTIGOS 100% FUNCIONAL:**
+  - ✅ Fonte preta no conteúdo (WYSIWYG e Markdown)
+  - ✅ Campo categoria populado (3 categorias disponíveis)
+  - ✅ Sistema de salvamento operacional
+  - ✅ APIs de categorias e tags funcionando
 
 **Técnico:**
 - Configuração de ambiente `.env.local`
