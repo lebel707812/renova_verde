@@ -46,7 +46,7 @@ function convertPrismaToArticle(prismaArticle: any): Article {
     seo: {
       title: prismaArticle.seoTitle || prismaArticle.title,
       description: prismaArticle.seoDescription || prismaArticle.excerpt || '',
-      keywords: prismaArticle.seoKeywords || [],
+      keywords: prismaArticle.seoKeywords ? prismaArticle.seoKeywords.split(',') : [],
       ogImage: prismaArticle.ogImage,
       canonicalUrl: prismaArticle.canonicalUrl,
       noIndex: prismaArticle.noIndex,
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
         status: articleData.status === 'published' ? 'PUBLISHED' : 'DRAFT',
         seoTitle: articleData.title,
         seoDescription: articleData.excerpt || '',
-        seoKeywords: articleData.tags?.map((t: any) => t.name) || [],
+        seoKeywords: articleData.tags?.map((t: any) => t.name).join(',') || '',
         authorId: author.id,
         categoryId: articleData.category?.id || 'jardinagem-urbana',
         publishedAt: articleData.status === 'published' ? new Date() : null,

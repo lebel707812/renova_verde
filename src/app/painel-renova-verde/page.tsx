@@ -27,8 +27,9 @@ export default function AdminLogin() {
       const data = await response.json();
 
       if (response.ok) {
-        // Salvar token no localStorage
+        // Salvar token no localStorage e cookie
         localStorage.setItem('admin_token', data.token);
+        document.cookie = `admin_token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
         // Redirecionar para o painel admin
         router.push('/admin/dashboard');
       } else {
