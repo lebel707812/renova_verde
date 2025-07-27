@@ -2,7 +2,7 @@ import 'next';
 
 declare module 'next' {
   interface PageProps {
-    params: Record<string, string | string[]>;
+    params?: Record<string, string>;
     searchParams?: Record<string, string | string[] | undefined>;
   }
 }

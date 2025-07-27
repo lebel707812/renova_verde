@@ -16,6 +16,8 @@ import {
   Trash2
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 interface Article {
   id: number;
@@ -57,6 +59,8 @@ export default function AdminDashboard() {
     totalAuthors: 0
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     fetchDashboardData();
@@ -64,17 +68,30 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      
       // Buscar artigos
-      const articlesResponse = await fetch('/api/admin/articles');
-      const articlesData = await articlesResponse.json();
-      setArticles(articlesData.articles || []);
+      const [articlesResponse, statsResponse] = await Promise.all([
+        fetch('/api/admin/articles'),
+        fetch('/api/admin/stats')
+      ]);
 
-      // Buscar estatísticas
-      const statsResponse = await fetch('/api/admin/stats');
-      const statsData = await statsResponse.json();
+      if (!articlesResponse.ok || !statsResponse.ok) {
+        throw new Error('Falha ao carregar dados');
+      }
+
+      const [articlesData, statsData] = await Promise.all([
+        articlesResponse.json(),
+        statsResponse.json()
+      ]);
+
+      setArticles(articlesData.articles || []);
       setStats(statsData);
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error);
+      setError('Falha ao carregar dados. Tente novamente mais tarde.');
+      toast.error('Erro ao carregar dados do dashboard');
     } finally {
       setLoading(false);
     }
@@ -90,23 +107,37 @@ export default function AdminDashboard() {
 
       if (response.ok) {
         setArticles(articles.filter(article => article.id !== id));
+        toast.success('Artigo excluído com sucesso');
       } else {
-        alert('Erro ao excluir artigo');
+        throw new Error('Falha ao excluir artigo');
       }
     } catch (error) {
       console.error('Erro ao excluir artigo:', error);
-      alert('Erro ao excluir artigo');
+      toast.error('Erro ao excluir artigo');
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('pt-BR');
+    try {
+      return new Date(dateString).toLocaleDateString('pt-BR');
+    } catch {
+      return dateString; // Fallback caso a data seja inválida
+    }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Carregando...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen flex-col gap-4">
+        <div className="text-lg text-red-600">{error}</div>
+        <Button onClick={fetchDashboardData}>Tentar novamente</Button>
       </div>
     );
   }
@@ -125,125 +156,176 @@ export default function AdminDashboard() {
 
       {/* Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Artigos</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalArticles}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats.publishedArticles} publicados, {stats.draftArticles} rascunhos
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard 
+          title="Total de Artigos"
+          value={stats.totalArticles}
+          description={`${stats.publishedArticles} publicados, ${stats.draftArticles} rascunhos`}
+          icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Visualizações</CardTitle>
-            <Eye className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Visualizações em todos os artigos
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard 
+          title="Total de Visualizações"
+          value={stats.totalViews.toLocaleString()}
+          description="Visualizações em todos os artigos"
+          icon={<Eye className="h-4 w-4 text-muted-foreground" />}
+        />
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Curtidas</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalLikes.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              Curtidas em todos os artigos
-            </p>
-          </CardContent>
-        </Card>
+        <StatCard 
+          title="Total de Curtidas"
+          value={stats.totalLikes.toLocaleString()}
+          description="Curtidas em todos os artigos"
+          icon={<Heart className="h-4 w-4 text-muted-foreground" />}
+        />
       </div>
 
       {/* Lista de Artigos Recentes */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Artigos Recentes</CardTitle>
-          <CardDescription>
-            Gerencie seus artigos mais recentes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {articles.length === 0 ? (
-              <p className="text-center text-gray-500 py-8">
-                Nenhum artigo encontrado. 
-                <Link href="/admin/articles/new" className="text-green-600 hover:underline ml-1">
-                  Criar primeiro artigo
-                </Link>
-              </p>
-            ) : (
-              articles.slice(0, 10).map((article) => (
-                <div key={article.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-lg">{article.title}</h3>
-                      <Badge 
-                        variant={article.status === 'published' ? 'default' : 'secondary'}
-                        className={article.status === 'published' ? 'bg-green-100 text-green-800' : ''}
-                      >
-                        {article.status === 'published' ? 'Publicado' : 'Rascunho'}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-gray-600">
-                      <span>Categoria: {article.category?.name}</span>
-                      <span>Autor: {article.author?.name}</span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-4 h-4" />
-                        {article.views}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        {article.likes}
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Criado em {formatDate(article.created_at)} • 
-                      Atualizado em {formatDate(article.updated_at)}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/admin/articles/${article.id}/edit`}>
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleDeleteArticle(article.id)}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-          
-          {articles.length > 10 && (
-            <div className="mt-6 text-center">
-              <Link href="/admin/articles">
-                <Button variant="outline">
-                  Ver Todos os Artigos
-                </Button>
-              </Link>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <RecentArticles 
+        articles={articles}
+        onDelete={handleDeleteArticle}
+        formatDate={formatDate}
+      />
     </div>
   );
 }
 
+// Componente de Estatística
+function StatCard({ title, value, description, icon }: {
+  title: string;
+  value: string | number;
+  description: string;
+  icon: React.ReactNode;
+}) {
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
+        {icon}
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold">{value}</div>
+        <p className="text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Componente de Artigos Recentes
+function RecentArticles({ articles, onDelete, formatDate }: {
+  articles: Article[];
+  onDelete: (id: number) => void;
+  formatDate: (dateString: string) => string;
+}) {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Artigos Recentes</CardTitle>
+        <CardDescription>Gerencie seus artigos mais recentes</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {articles.length === 0 ? (
+            <NoArticlesMessage />
+          ) : (
+            articles.slice(0, 10).map((article) => (
+              <ArticleItem 
+                key={article.id}
+                article={article}
+                onDelete={onDelete}
+                formatDate={formatDate}
+              />
+            ))
+          )}
+        </div>
+        
+        {articles.length > 10 && <ViewAllArticlesButton />}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Componente de Mensagem quando não há artigos
+function NoArticlesMessage() {
+  return (
+    <p className="text-center text-gray-500 py-8">
+      Nenhum artigo encontrado. 
+      <Link href="/admin/articles/new" className="text-green-600 hover:underline ml-1">
+        Criar primeiro artigo
+      </Link>
+    </p>
+  );
+}
+
+// Componente de Item de Artigo
+function ArticleItem({ article, onDelete, formatDate }: {
+  article: Article;
+  onDelete: (id: number) => void;
+  formatDate: (dateString: string) => string;
+}) {
+  return (
+    <div className="flex items-center justify-between p-4 border rounded-lg">
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-2">
+          <h3 className="font-semibold text-lg">{article.title}</h3>
+          <Badge 
+            variant={article.status === 'published' ? 'default' : 'secondary'}
+            className={article.status === 'published' ? 'bg-green-100 text-green-800' : ''}
+          >
+            {article.status === 'published' ? 'Publicado' : 'Rascunho'}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-4 text-sm text-gray-600">
+          <span>Categoria: {article.category?.name}</span>
+          <span>Autor: {article.author?.name}</span>
+          <span className="flex items-center gap-1">
+            <Eye className="w-4 h-4" />
+            {article.views}
+          </span>
+          <span className="flex items-center gap-1">
+            <Heart className="w-4 h-4" />
+            {article.likes}
+          </span>
+        </div>
+        <div className="text-xs text-gray-500 mt-1">
+          Criado em {formatDate(article.created_at)} • 
+          Atualizado em {formatDate(article.updated_at)}
+        </div>
+      </div>
+      <ArticleActions articleId={article.id} onDelete={onDelete} />
+    </div>
+  );
+}
+
+// Componente de Ações do Artigo
+function ArticleActions({ articleId, onDelete }: {
+  articleId: number;
+  onDelete: (id: number) => void;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <Link href={`/admin/articles/${articleId}/edit`}>
+        <Button variant="outline" size="sm">
+          <Edit className="w-4 h-4" />
+        </Button>
+      </Link>
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={() => onDelete(articleId)}
+        className="text-red-600 hover:text-red-700"
+      >
+        <Trash2 className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+}
+
+// Componente do Botão "Ver Todos"
+function ViewAllArticlesButton() {
+  return (
+    <div className="mt-6 text-center">
+      <Link href="/admin/articles">
+        <Button variant="outline">Ver Todos os Artigos</Button>
+      </Link>
+    </div>
+  );
+}
