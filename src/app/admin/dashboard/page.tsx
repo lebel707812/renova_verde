@@ -1,247 +1,248 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  BarChart3, 
+  FileText, 
+  Users, 
+  Eye, 
+  Heart, 
+  TrendingUp,
+  Plus,
+  Edit,
+  Trash2
+} from 'lucide-react';
 import Link from 'next/link';
+
+interface Article {
+  id: number;
+  title: string;
+  slug: string;
+  status: 'draft' | 'published';
+  views: number;
+  likes: number;
+  category: {
+    id: number;
+    name: string;
+    color: string;
+  };
+  author: {
+    id: number;
+    name: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
 
 interface DashboardStats {
   totalArticles: number;
   publishedArticles: number;
   draftArticles: number;
   totalViews: number;
+  totalLikes: number;
+  totalAuthors: number;
 }
 
 export default function AdminDashboard() {
-  const { isAuthenticated, isLoading, logout, getAuthHeaders } = useAuth();
+  const [articles, setArticles] = useState<Article[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalArticles: 0,
     publishedArticles: 0,
     draftArticles: 0,
-    totalViews: 0
+    totalViews: 0,
+    totalLikes: 0,
+    totalAuthors: 0
   });
-  const [loadingStats, setLoadingStats] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchStats();
-    }
-  }, [isAuthenticated]);
+    fetchDashboardData();
+  }, []);
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await fetch('/api/admin/articles', {
-        headers: getAuthHeaders()
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const articles = data.articles || [];
-        
-        const published = articles.filter((a: any) => a.status === 'published').length;
-        const draft = articles.filter((a: any) => a.status === 'draft').length;
-        const totalViews = articles.reduce((sum: number, a: any) => sum + (a.views || 0), 0);
-        
-        setStats({
-          totalArticles: articles.length,
-          publishedArticles: published,
-          draftArticles: draft,
-          totalViews
-        });
-      }
+      // Buscar artigos
+      const articlesResponse = await fetch('/api/admin/articles');
+      const articlesData = await articlesResponse.json();
+      setArticles(articlesData.articles || []);
+
+      // Buscar estatísticas
+      const statsResponse = await fetch('/api/admin/stats');
+      const statsData = await statsResponse.json();
+      setStats(statsData);
     } catch (error) {
-      console.error('Erro ao carregar estatísticas:', error);
+      console.error('Erro ao carregar dados do dashboard:', error);
     } finally {
-      setLoadingStats(false);
+      setLoading(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleDeleteArticle = async (id: number) => {
+    if (!confirm('Tem certeza que deseja excluir este artigo?')) return;
 
-  if (!isAuthenticated) {
+    try {
+      const response = await fetch(`/api/admin/articles/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setArticles(articles.filter(article => article.id !== id));
+      } else {
+        alert('Erro ao excluir artigo');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir artigo:', error);
+      alert('Erro ao excluir artigo');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR');
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Acesso Negado</h1>
-          <p className="text-gray-600 mb-4">Você precisa estar logado para acessar esta página.</p>
-          <Link 
-            href="/painel-renova-verde"
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition-colors"
-          >
-            Fazer Login
-          </Link>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Carregando...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">
-                Painel Administrativo - Renova Verde
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/admin/articles"
-                className="text-green-600 hover:text-green-700 font-medium"
-              >
-                Editor de Artigos
+    <div className="container mx-auto p-6 space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold text-gray-900">Dashboard Administrativo</h1>
+        <Link href="/admin/articles/new">
+          <Button className="bg-green-600 hover:bg-green-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Artigo
+          </Button>
+        </Link>
+      </div>
+
+      {/* Estatísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Artigos</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalArticles}</div>
+            <p className="text-xs text-muted-foreground">
+              {stats.publishedArticles} publicados, {stats.draftArticles} rascunhos
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Visualizações</CardTitle>
+            <Eye className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalViews.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              Visualizações em todos os artigos
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total de Curtidas</CardTitle>
+            <Heart className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalLikes.toLocaleString()}</div>
+            <p className="text-xs text-muted-foreground">
+              Curtidas em todos os artigos
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lista de Artigos Recentes */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Artigos Recentes</CardTitle>
+          <CardDescription>
+            Gerencie seus artigos mais recentes
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {articles.length === 0 ? (
+              <p className="text-center text-gray-500 py-8">
+                Nenhum artigo encontrado. 
+                <Link href="/admin/articles/new" className="text-green-600 hover:underline ml-1">
+                  Criar primeiro artigo
+                </Link>
+              </p>
+            ) : (
+              articles.slice(0, 10).map((article) => (
+                <div key={article.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-semibold text-lg">{article.title}</h3>
+                      <Badge 
+                        variant={article.status === 'published' ? 'default' : 'secondary'}
+                        className={article.status === 'published' ? 'bg-green-100 text-green-800' : ''}
+                      >
+                        {article.status === 'published' ? 'Publicado' : 'Rascunho'}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span>Categoria: {article.category?.name}</span>
+                      <span>Autor: {article.author?.name}</span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        {article.views}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-4 h-4" />
+                        {article.likes}
+                      </span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Criado em {formatDate(article.created_at)} • 
+                      Atualizado em {formatDate(article.updated_at)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/admin/articles/${article.id}/edit`}>
+                      <Button variant="outline" size="sm">
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleDeleteArticle(article.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+          
+          {articles.length > 10 && (
+            <div className="mt-6 text-center">
+              <Link href="/admin/articles">
+                <Button variant="outline">
+                  Ver Todos os Artigos
+                </Button>
               </Link>
-              <button
-                onClick={logout}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-              >
-                Sair
-              </button>
             </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h2>
-            <p className="text-gray-600">Visão geral do seu blog</p>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">📝</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Total de Artigos
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {loadingStats ? '...' : stats.totalArticles}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">✅</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Publicados
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {loadingStats ? '...' : stats.publishedArticles}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">📄</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Rascunhos
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {loadingStats ? '...' : stats.draftArticles}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">👁️</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Total de Visualizações
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {loadingStats ? '...' : stats.totalViews}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-white shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                Ações Rápidas
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Link
-                  href="/admin/articles/new"
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors"
-                >
-                  ✏️ Criar Novo Artigo
-                </Link>
-                <Link
-                  href="/admin/articles"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors"
-                >
-                  📋 Gerenciar Artigos
-                </Link>
-                <Link
-                  href="/"
-                  target="_blank"
-                  className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg text-center font-medium transition-colors"
-                >
-                  🌐 Ver Site Público
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
