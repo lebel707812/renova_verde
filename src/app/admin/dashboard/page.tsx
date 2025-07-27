@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -140,6 +140,148 @@ export default function AdminDashboard() {
     }
   };
 
+  // Componente de Estatística
+  function StatCard({ title, value, description, icon }: {
+    title: string;
+    value: string | number;
+    description: string;
+    icon: React.ReactNode;
+  }) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          {icon}
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{value}</div>
+          <p className="text-xs text-muted-foreground">{description}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Componente de Artigos Recentes
+  function RecentArticles({ articles, onDelete, formatDate }: {
+    articles: Article[];
+    onDelete: (id: number) => void;
+    formatDate: (dateString: string) => string;
+  }) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Artigos Recentes</CardTitle>
+          <CardDescription>Gerencie seus artigos mais recentes</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {articles.length === 0 ? (
+              <NoArticlesMessage />
+            ) : (
+              articles.slice(0, 10).map((article) => (
+                <ArticleItem 
+                  key={article.id}
+                  article={article}
+                  onDelete={onDelete}
+                  formatDate={formatDate}
+                />
+              ))
+            )}
+          </div>
+          
+          {articles.length > 10 && <ViewAllArticlesButton />}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Componente de Mensagem quando não há artigos
+  function NoArticlesMessage() {
+    return (
+      <p className="text-center text-gray-500 py-8">
+        Nenhum artigo encontrado. 
+        <Link href="/admin/articles/new" className="text-green-600 hover:underline ml-1">
+          Criar primeiro artigo
+        </Link>
+      </p>
+    );
+  }
+
+  // Componente de Item de Artigo
+  function ArticleItem({ article, onDelete, formatDate }: {
+    article: Article;
+    onDelete: (id: number) => void;
+    formatDate: (dateString: string) => string;
+  }) {
+    return (
+      <div className="flex items-center justify-between p-4 border rounded-lg">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-2">
+            <h3 className="font-semibold text-lg">{article.title}</h3>
+            <Badge 
+              variant={article.status === 'published' ? 'default' : 'secondary'}
+              className={article.status === 'published' ? 'bg-green-100 text-green-800' : ''}
+            >
+              {article.status === 'published' ? 'Publicado' : 'Rascunho'}
+            </Badge>
+          </div>
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <span>Categoria: {article.category?.name}</span>
+            <span>Autor: {article.author?.name}</span>
+            <span className="flex items-center gap-1">
+              <Eye className="w-4 h-4" />
+              {article.views}
+            </span>
+            <span className="flex items-center gap-1">
+              <Heart className="w-4 h-4" />
+              {article.likes}
+            </span>
+          </div>
+          <div className="text-xs text-gray-500 mt-1">
+            Criado em {formatDate(article.created_at)} • 
+            Atualizado em {formatDate(article.updated_at)}
+          </div>
+        </div>
+        <ArticleActions articleId={article.id} onDelete={onDelete} />
+      </div>
+    );
+  }
+
+  // Componente de Ações do Artigo
+  function ArticleActions({ articleId, onDelete }: {
+    articleId: number;
+    onDelete: (id: number) => void;
+  }) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link href={`/admin/articles/${articleId}/edit`}>
+          <Button variant="outline" size="sm">
+            <Edit className="w-4 h-4" />
+          </Button>
+        </Link>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={() => onDelete(articleId)}
+          className="text-red-600 hover:text-red-700"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    );
+  }
+
+  // Componente do Botão "Ver Todos"
+  function ViewAllArticlesButton() {
+    return (
+      <div className="mt-6 text-center">
+        <Link href="/admin/articles">
+          <Button variant="outline">Ver Todos os Artigos</Button>
+        </Link>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -203,145 +345,4 @@ export default function AdminDashboard() {
   );
 }
 
-// Componente de Estatística
-function StatCard({ title, value, description, icon }: {
-  title: string;
-  value: string | number;
-  description: string;
-  icon: React.ReactNode;
-}) {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {icon}
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
-      </CardContent>
-    </Card>
-  );
-}
-
-// Componente de Artigos Recentes
-function RecentArticles({ articles, onDelete, formatDate }: {
-  articles: Article[];
-  onDelete: (id: number) => void;
-  formatDate: (dateString: string) => string;
-}) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Artigos Recentes</CardTitle>
-        <CardDescription>Gerencie seus artigos mais recentes</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {articles.length === 0 ? (
-            <NoArticlesMessage />
-          ) : (
-            articles.slice(0, 10).map((article) => (
-              <ArticleItem 
-                key={article.id}
-                article={article}
-                onDelete={onDelete}
-                formatDate={formatDate}
-              />
-            ))
-          )}
-        </div>
-        
-        {articles.length > 10 && <ViewAllArticlesButton />}
-      </CardContent>
-    </Card>
-  );
-}
-
-// Componente de Mensagem quando não há artigos
-function NoArticlesMessage() {
-  return (
-    <p className="text-center text-gray-500 py-8">
-      Nenhum artigo encontrado. 
-      <Link href="/admin/articles/new" className="text-green-600 hover:underline ml-1">
-        Criar primeiro artigo
-      </Link>
-    </p>
-  );
-}
-
-// Componente de Item de Artigo
-function ArticleItem({ article, onDelete, formatDate }: {
-  article: Article;
-  onDelete: (id: number) => void;
-  formatDate: (dateString: string) => string;
-}) {
-  return (
-    <div className="flex items-center justify-between p-4 border rounded-lg">
-      <div className="flex-1">
-        <div className="flex items-center gap-2 mb-2">
-          <h3 className="font-semibold text-lg">{article.title}</h3>
-          <Badge 
-            variant={article.status === 'published' ? 'default' : 'secondary'}
-            className={article.status === 'published' ? 'bg-green-100 text-green-800' : ''}
-          >
-            {article.status === 'published' ? 'Publicado' : 'Rascunho'}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-4 text-sm text-gray-600">
-          <span>Categoria: {article.category?.name}</span>
-          <span>Autor: {article.author?.name}</span>
-          <span className="flex items-center gap-1">
-            <Eye className="w-4 h-4" />
-            {article.views}
-          </span>
-          <span className="flex items-center gap-1">
-            <Heart className="w-4 h-4" />
-            {article.likes}
-          </span>
-        </div>
-        <div className="text-xs text-gray-500 mt-1">
-          Criado em {formatDate(article.created_at)} • 
-          Atualizado em {formatDate(article.updated_at)}
-        </div>
-      </div>
-      <ArticleActions articleId={article.id} onDelete={onDelete} />
-    </div>
-  );
-}
-
-// Componente de Ações do Artigo
-function ArticleActions({ articleId, onDelete }: {
-  articleId: number;
-  onDelete: (id: number) => void;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <Link href={`/admin/articles/${articleId}/edit`}>
-        <Button variant="outline" size="sm">
-          <Edit className="w-4 h-4" />
-        </Button>
-      </Link>
-      <Button 
-        variant="outline" 
-        size="sm"
-        onClick={() => onDelete(articleId)}
-        className="text-red-600 hover:text-red-700"
-      >
-        <Trash2 className="w-4 h-4" />
-      </Button>
-    </div>
-  );
-}
-
-// Componente do Botão "Ver Todos"
-function ViewAllArticlesButton() {
-  return (
-    <div className="mt-6 text-center">
-      <Link href="/admin/articles">
-        <Button variant="outline">Ver Todos os Artigos</Button>
-      </Link>
-    </div>
-  );
-}
 
