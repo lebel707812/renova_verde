@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
 
 // Tags hardcoded como fallback
 const hardcodedTags = [
@@ -36,16 +37,27 @@ const hardcodedTags = [
 
 export async function GET(request: NextRequest) {
   try {
+    // Tentar buscar do banco de dados primeiro
+    const tags = await prisma.tag.findMany({
+      orderBy: {
+        name: 'asc'
+      }
+    });
+
+    // Se não houver tags no banco, usar hardcoded
+    const finalTags = tags.length > 0 ? tags : hardcodedTags;
+
+    return NextResponse.json({
+      tags: finalTags,
+      total: finalTags.length
+    });
+  } catch (error) {
+    console.error('Erro ao buscar tags:', error);
+    // Em caso de erro, usar fallback
     return NextResponse.json({
       tags: hardcodedTags,
       total: hardcodedTags.length
     });
-  } catch (error) {
-    console.error('Erro ao buscar tags:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
   }
 }
 
@@ -54,15 +66,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { name } = body;
 
-    // Simular criação de nova tag
-    const newTag = {
-      id: hardcodedTags.length + 1,
-      name,
-      slug: name.toLowerCase().replace(/\s+/g, '-')
-    };
+    const slug = name.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-');
 
-    // Adicionar à lista hardcoded para simular persistência
-    hardcodedTags.push(newTag);
+    const newTag = await prisma.tag.create({
+      data: {
+        name,
+        slug
+      }
+    });
 
     return NextResponse.json(newTag, { status: 201 });
   } catch (error) {
