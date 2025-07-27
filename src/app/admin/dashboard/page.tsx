@@ -1,15 +1,16 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  BarChart3, 
-  FileText, 
-  Users, 
-  Eye, 
-  Heart, 
+import {
+  BarChart3,
+  FileText,
+  Users,
+  Eye,
+  Heart,
   TrendingUp,
   Plus,
   Edit,
@@ -71,14 +72,25 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
       
-      // Buscar artigos
+      console.log('Fetching articles and stats...');
       const [articlesResponse, statsResponse] = await Promise.all([
         fetch('/api/admin/articles'),
         fetch('/api/admin/stats')
       ]);
 
-      if (!articlesResponse.ok || !statsResponse.ok) {
-        throw new Error('Falha ao carregar dados');
+      console.log('Articles response status:', articlesResponse.status);
+      console.log('Stats response status:', statsResponse.status);
+
+      if (!articlesResponse.ok) {
+        const errorText = await articlesResponse.text();
+        console.error('Articles API error response:', errorText);
+        throw new Error(`Falha ao carregar artigos: ${articlesResponse.status} ${articlesResponse.statusText} - ${errorText}`);
+      }
+
+      if (!statsResponse.ok) {
+        const errorText = await statsResponse.text();
+        console.error('Stats API error response:', errorText);
+        throw new Error(`Falha ao carregar estatísticas: ${statsResponse.status} ${statsResponse.statusText} - ${errorText}`);
       }
 
       const [articlesData, statsData] = await Promise.all([
@@ -86,11 +98,14 @@ export default function AdminDashboard() {
         statsResponse.json()
       ]);
 
+      console.log('Articles data:', articlesData);
+      console.log('Stats data:', statsData);
+
       setArticles(articlesData.articles || []);
       setStats(statsData);
-    } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
-      setError('Falha ao carregar dados. Tente novamente mais tarde.');
+    } catch (error: any) {
+      console.error('Erro ao carregar dados do dashboard:', error.message);
+      setError(`Falha ao carregar dados: ${error.message}. Tente novamente mais tarde.`);
       toast.error('Erro ao carregar dados do dashboard');
     } finally {
       setLoading(false);
@@ -329,3 +344,4 @@ function ViewAllArticlesButton() {
     </div>
   );
 }
+

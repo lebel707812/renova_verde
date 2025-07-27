@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('Attempting to fetch articles...');
     const articles = await prisma.article.findMany({
       include: {
         category: true,
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
         created_at: 'desc',
       },
     });
+    console.log('Articles fetched successfully:', articles.length);
 
     return NextResponse.json({
       articles,
@@ -20,10 +22,10 @@ export async function GET(request: NextRequest) {
       page: 1,
       per_page: 50,
     });
-  } catch (error) {
-    console.error('Erro ao buscar artigos:', error);
+  } catch (error: any) {
+    console.error('Erro ao buscar artigos:', error.message, error.stack);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor ao buscar artigos', details: error.message },
       { status: 500 }
     );
   }
@@ -38,14 +40,16 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
+    console.log(`Attempting to delete article with ID: ${id}`);
     await prisma.article.delete({
       where: { id },
     });
+    console.log(`Article with ID: ${id} deleted successfully.`);
     return NextResponse.json({ success: true, message: 'Artigo excluído com sucesso' });
-  } catch (error) {
-    console.error('Erro ao excluir artigo:', error);
+  } catch (error: any) {
+    console.error('Erro ao excluir artigo:', error.message, error.stack);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor ao excluir artigo', details: error.message },
       { status: 500 }
     );
   }
@@ -62,17 +66,19 @@ export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
     const { status } = body;
+    console.log(`Attempting to update article status for ID: ${id} to ${status}`);
 
     const updatedArticle = await prisma.article.update({
       where: { id },
       data: { status },
     });
+    console.log(`Article with ID: ${id} status updated successfully.`);
 
     return NextResponse.json(updatedArticle);
-  } catch (error) {
-    console.error('Erro ao atualizar status do artigo:', error);
+  } catch (error: any) {
+    console.error('Erro ao atualizar status do artigo:', error.message, error.stack);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: 'Erro interno do servidor ao atualizar status do artigo', details: error.message },
       { status: 500 }
     );
   }
@@ -82,6 +88,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { tags, category_id, author_id, ...data } = body;
+    console.log('Attempting to create new article...');
 
     const newArticle = await prisma.article.create({
       data: {
@@ -98,12 +105,13 @@ export async function POST(request: NextRequest) {
         tags: true,
       },
     });
+    console.log('Article created successfully:', newArticle.id);
 
     return NextResponse.json(newArticle, { status: 201 });
-  } catch (error) {
-    console.error('Erro ao criar artigo:', error);
+  } catch (error: any) {
+    console.error('Erro ao criar artigo:', error.message, error.stack);
     return NextResponse.json(
-      { message: 'Erro interno do servidor ao criar artigo' },
+      { message: 'Erro interno do servidor ao criar artigo', details: error.message },
       { status: 500 }
     );
   }
