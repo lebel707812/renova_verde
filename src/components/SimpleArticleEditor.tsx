@@ -210,6 +210,7 @@ export default function SimpleArticleEditor({ article, onSave, onCancel, loading
                   </label>
                 ))}
               </div>
+            </div>
           </div>
 
           {/* Status */}

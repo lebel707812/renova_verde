@@ -68,8 +68,15 @@ export default function ArticlePage({ params }: ArticlePageProps) {
   }
 
   const relatedArticles = getRelatedArticles(article.id);
-  const breadcrumbs = generateBreadcrumbs(article);
-  const structuredData = generateArticleStructuredData(article);
+  const breadcrumbs = generateBreadcrumbs(article.slug, article.title);
+  const structuredData = generateArticleStructuredData({
+    title: article.title,
+    description: article.excerpt,
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt,
+    author: article.author.name,
+    image: article.featuredImage
+  });
 
   return (
     <>
@@ -96,10 +103,10 @@ export default function ArticlePage({ params }: ArticlePageProps) {
                     </svg>
                   )}
                   {index === breadcrumbs.length - 1 ? (
-                    <span className="text-gray-500 truncate max-w-xs">{item.label}</span>
+                    <span className="text-gray-500 truncate max-w-xs">{item.name}</span>
                   ) : (
                     <Link href={item.href} className="text-primary hover:text-primary-700 transition-colors">
-                      {item.label}
+                      {item.name}
                     </Link>
                   )}
                 </li>

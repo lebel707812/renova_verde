@@ -18,13 +18,13 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/android-chrome-192x192.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'maskable any',
+        purpose: 'any',
       },
       {
         src: '/android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png',
-        purpose: 'maskable any',
+        purpose: 'any',
       },
       {
         src: '/apple-touch-icon.png',
@@ -66,22 +66,6 @@ export default function manifest(): MetadataRoute.Manifest {
         description: 'Entre em contato conosco',
         url: '/contato',
         icons: [{ src: '/favicon-32x32.png', sizes: '32x32' }],
-      },
-    ],
-    screenshots: [
-      {
-        src: '/screenshots/desktop-home.png',
-        sizes: '1280x720',
-        type: 'image/png',
-        form_factor: 'wide',
-        label: 'Página inicial do Renova Verde Hub',
-      },
-      {
-        src: '/screenshots/mobile-home.png',
-        sizes: '375x812',
-        type: 'image/png',
-        form_factor: 'narrow',
-        label: 'Página inicial mobile do Renova Verde Hub',
       },
     ],
   };
