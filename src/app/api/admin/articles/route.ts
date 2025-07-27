@@ -1,42 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mockArticles, mockAuthors, mockCategories } from '@/lib/mock-data';
-
-// Simulando dados de artigos com estrutura compatível com o dashboard
-const transformArticleForAdmin = (article: any) => ({
-  id: parseInt(article.id),
-  title: article.title,
-  slug: article.slug,
-  status: article.status,
-  views: article.views || 0,
-  likes: article.likes || 0,
-  category: {
-    id: parseInt(article.category.id),
-    name: article.category.name,
-    color: article.category.color
-  },
-  author: {
-    id: parseInt(article.author.id),
-    name: article.author.name
-  },
-  created_at: article.publishedAt,
-  updated_at: article.updatedAt
-});
+import prisma from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
-    // Transformar os dados mock para o formato esperado pelo dashboard
-    const transformedArticles = mockArticles.map(transformArticleForAdmin);
-    
-    // Ordenar por data de criação (mais recentes primeiro)
-    const sortedArticles = transformedArticles.sort((a, b) => 
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    const articles = await prisma.article.findMany({
+      include: {
+        category: true,
+        author: true,
+        tags: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
 
     return NextResponse.json({
-      articles: sortedArticles,
-      total: sortedArticles.length,
+      articles,
+      total: articles.length,
       page: 1,
-      per_page: 50
+      per_page: 50,
     });
   } catch (error) {
     console.error('Erro ao buscar artigos:', error);
@@ -48,7 +30,83 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  // Esta é uma simulação - em produção, você removeria do banco de dados
-  return NextResponse.json({ success: true });
+  const { searchParams } = new URL(request.url);
+  const id = parseInt(searchParams.get('id') || '0');
+
+  if (!id) {
+    return NextResponse.json({ error: 'ID do artigo inválido' }, { status: 400 });
+  }
+
+  try {
+    await prisma.article.delete({
+      where: { id },
+    });
+    return NextResponse.json({ success: true, message: 'Artigo excluído com sucesso' });
+  } catch (error) {
+    console.error('Erro ao excluir artigo:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
 }
+
+export async function PATCH(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const id = parseInt(searchParams.get('id') || '0');
+
+  if (!id) {
+    return NextResponse.json({ error: 'ID do artigo inválido' }, { status: 400 });
+  }
+
+  try {
+    const body = await request.json();
+    const { status } = body;
+
+    const updatedArticle = await prisma.article.update({
+      where: { id },
+      data: { status },
+    });
+
+    return NextResponse.json(updatedArticle);
+  } catch (error) {
+    console.error('Erro ao atualizar status do artigo:', error);
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { tags, category_id, author_id, ...data } = body;
+
+    const newArticle = await prisma.article.create({
+      data: {
+        ...data,
+        category: category_id ? { connect: { id: category_id } } : undefined,
+        author: author_id ? { connect: { id: author_id } } : undefined,
+        tags: {
+          connect: tags.map((tagId: number) => ({ id: tagId })),
+        },
+      },
+      include: {
+        category: true,
+        author: true,
+        tags: true,
+      },
+    });
+
+    return NextResponse.json(newArticle, { status: 201 });
+  } catch (error) {
+    console.error('Erro ao criar artigo:', error);
+    return NextResponse.json(
+      { message: 'Erro interno do servidor ao criar artigo' },
+      { status: 500 }
+    );
+  }
+}
+
 
