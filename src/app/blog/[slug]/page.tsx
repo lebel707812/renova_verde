@@ -3,20 +3,19 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Calendar, Clock, User, Tag, ArrowLeft, Share2, Heart, Eye } from 'lucide-react';
-
+import type { PageProps } from 'next'
 import Header from '@/components/landing/Header';
 import { getArticleBySlug, getRelatedArticles } from '@/lib/mock-data';
 import { formatDate, formatRelativeDate, generateArticleStructuredData, generateBreadcrumbs } from '@/lib/utils';
 import { Article } from '@/types';
 
 interface ArticlePageProps {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<Record<string, string | string[]>>;
 }
 
 // Função para gerar metadata dinâmica
-export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = getArticleBySlug(params.slug);
   
   if (!article) {
@@ -60,7 +59,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   };
 }
 
-export default function ArticlePage({ params }: ArticlePageProps) {
+export default function ArticlePage({ params }: { params: { slug: string } }) {
   const article = getArticleBySlug(params.slug);
   
   if (!article) {
